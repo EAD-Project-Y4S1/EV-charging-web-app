@@ -6,13 +6,10 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: 'http://localhost:5148', // Backend HTTP port
-  timeout: 10000, // 10 second timeout
+  timeout: 20000, // 20 second timeout
   headers: {
     'Content-Type': 'application/json',
-  },
-  // Force HTTP protocol
-  httpsAgent: false,
-  httpAgent: true
+  }
 })
 
 // Attach JWT token from localStorage to every request

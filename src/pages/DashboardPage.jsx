@@ -15,9 +15,8 @@ export default function DashboardPage() {
     let mounted = true
     ;(async () => {
       try {
-        // Example expected endpoints (adjust to backend):
-        // GET /dashboard/summary -> { users, owners, stations, bookings }
-        const res = await api.get('/dashboard/summary')
+        // GET /api/dashboard/summary -> { users, owners, stations, bookings }
+        const res = await api.get('/api/dashboard/summary')
         if (mounted) setCounts(res.data)
       } catch (err) {
         setError(err?.response?.data?.message || 'Failed to load dashboard')
@@ -26,17 +25,20 @@ export default function DashboardPage() {
     return () => { mounted = false }
   }, [])
 
+  // Layout: Responsive grid of four equal cards with spacing and centering
   return (
-    <div>
-      <h3 className="mb-4">Dashboard</h3>
-      <div className="text-muted mb-3">Welcome, {user?.username} ({user?.role})</div>
+    // Full-width content with padding
+    <div className="mt-4 p-3 p-md-4">
+      <h3 className="mb-2">Dashboard</h3>
+      <div className="text-muted mb-4">Welcome, {user?.email} ({user?.role})</div>
       {error && <div className="alert alert-danger">{error}</div>}
-      <div className="row g-3">
+      {/* Full-width grid: stretch cards across available width */}
+      <div className="row g-4">
         {['users','owners','stations','bookings'].map((key) => (
-          <div className="col-12 col-sm-6 col-lg-3" key={key}>
-            <div className="card shadow-sm">
-              <div className="card-body">
-                <div className="text-uppercase small text-muted">{key}</div>
+          <div className="col-12 col-sm-6 col-lg-3 d-flex" key={key}>
+            <div className="card shadow-lg w-100 text-center">
+              <div className="card-body py-4">
+                <div className="text-uppercase small text-muted mb-1">{key}</div>
                 <div className="display-6">{counts?.[key] ?? '-'}</div>
               </div>
             </div>

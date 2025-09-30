@@ -12,8 +12,10 @@ export function AppNavbar() {
   const isOperator = user?.role === 'Operator'
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container">
+    // Width adjustment: make navbar full-width and fixed to top
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      {/* Changed from .container to .container-fluid for full-width navbar */}
+      <div className="container-fluid">
         <Link className="navbar-brand" to="/">EV Charging</Link>
         <button
           className="navbar-toggler"
@@ -53,7 +55,7 @@ export function AppNavbar() {
             )}
           </ul>
           <div className="d-flex align-items-center gap-3 text-white-50">
-            <span title="role">{user?.username} ({user?.role})</span>
+            <span title="role">{user?.email} ({user?.role})</span>
             <button className="btn btn-outline-light btn-sm" onClick={logout}>Logout</button>
           </div>
         </div>

@@ -7,7 +7,6 @@
 import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import api from '../services/api'
 
 export default function LoginPage() {
   const { isAuthenticated, login } = useAuth()
@@ -24,17 +23,8 @@ export default function LoginPage() {
     setLoading(true)
     
     try {
-      const response = await api.post('/api/auth/login', {
-        email: form.email,
-        password: form.password
-      })
-
-      const { data } = response
-      
-      // Call the login function from AuthContext with the token and expiry
-      await login(data.access_token, new Date(data.expires_at))
-      
-      // Redirect to dashboard on success
+      // Delegate authentication to AuthContext
+      await login({ email: form.email, password: form.password })
       navigate('/')
     } catch (err) {
       console.error('Login error:', err)

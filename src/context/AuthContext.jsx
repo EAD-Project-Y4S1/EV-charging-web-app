@@ -29,12 +29,37 @@ export function AuthProvider({ children }) {
     else localStorage.removeItem('user')
   }, [user])
 
+  function decodeJwt(token) {
+    try {
+      const base64Url = token.split('.')[1]
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+      return JSON.parse(jsonPayload)
+    } catch (e) {
+      return null
+    }
+  }
+
   async function login(credentials) {
-    // credentials: { username, password }
-    const response = await api.post('/auth/login', credentials)
-    // Expected response example:
-    // { token: 'jwtString', user: { id, username, role: 'Backoffice'|'Operator' } }
-    const { token: jwt, user: userInfo } = response.data
+    // credentials: { email, password }
+    const response = await api.post('/api/auth/login', credentials)
+    // Backend returns: { access_token, expires_at }
+    const { access_token: jwt } = response.data
+    const claims = decodeJwt(jwt) || {}
+    const userInfo = {
+      id: claims.sub,
+      email: claims.email || claims["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+      fullName: claims.name || claims["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
+      role:
+        claims.role ||
+        claims["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+        claims["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"]
+    }
     setToken(jwt)
     setUser(userInfo)
     return userInfo

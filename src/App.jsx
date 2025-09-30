@@ -48,7 +48,7 @@ function App() {
           <Route
             path="stations"
             element={
-              <ProtectedRoute roles={["Backoffice", "Operator"]}>
+              <ProtectedRoute roles={["Backoffice", "StationOperator"]}>
                 <StationsPage />
               </ProtectedRoute>
             }
@@ -56,7 +56,7 @@ function App() {
           <Route
             path="bookings"
             element={
-              <ProtectedRoute roles={["Backoffice", "Operator"]}>
+              <ProtectedRoute roles={["Backoffice", "StationOperator"]}>
                 <BookingsPage />
               </ProtectedRoute>
             }
@@ -70,9 +70,11 @@ function App() {
 
 function Layout() {
   return (
+    // Layout width: use container-fluid for full width and padding for breathing room
     <div className="container-fluid p-0">
       <AppNavbar />
-      <div className="container py-4">
+      {/* Changed from .container to .container-fluid to allow full-width pages; add padding */}
+      <div className="container-fluid p-4" style={{ marginTop: '64px' }}>
         <Outlet />
       </div>
     </div>
