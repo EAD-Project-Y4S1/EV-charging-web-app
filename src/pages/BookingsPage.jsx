@@ -46,7 +46,7 @@ export default function BookingsPage() {
     setError(''); setSuccess('')
     setLoadingMode('none')
     try {
-      const res = await api.get('/api/bookings')
+      const res = await api.get('/api/bookings/getall')
       setBookings(res.data)
       setSelectedStationId('')
       setSelectedOwnerNIC('')
