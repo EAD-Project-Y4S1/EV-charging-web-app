@@ -55,7 +55,7 @@ export default function BookingsPage() {
       const testData = testDataOptions[i]
       try {
         console.log(`Testing booking creation attempt ${i + 1} with data:`, testData)
-        const response = await api.post('/api/bookings', testData)
+        const response = await api.post('/api/bookings/create', testData)
         console.log('Backend accepted booking data:', response.data)
         setSuccess(`Test booking creation successful with format ${i + 1}!`)
         return // Exit if successful
@@ -218,9 +218,9 @@ export default function BookingsPage() {
             setSuccess('Booking updated')
             success = true
           } else {
-            // Example: POST /api/bookings
+            // Example: POST /api/bookings/create
             console.log('Creating booking:', payload)
-            await api.post('/api/bookings', payload)
+            await api.post('/api/bookings/create', payload)
             setSuccess('Booking created')
             success = true
           }
