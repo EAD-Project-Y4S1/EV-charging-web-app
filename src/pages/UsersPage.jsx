@@ -13,7 +13,7 @@ export default function UsersPage() {
   const [success, setSuccess] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ email: '', password: '', fullName: '', role: 'Backoffice', isActive: true })
+  const [form, setForm] = useState({ email: '', password: '', fullName: '', role: '1', isActive: true })
 
   // Load all users
   useEffect(() => {
@@ -36,14 +36,14 @@ export default function UsersPage() {
   // Open create form
   function onAdd() {
     setEditing(null)
-    setForm({ email: '', password: '', fullName: '', role: 'Backoffice', isActive: true })
+    setForm({ email: '', password: '', fullName: '', role: '1', isActive: true })
     setShowForm(true)
   }
 
   // Open edit form
   function onEdit(u) {
     setEditing(u)
-    setForm({ email: u.email, password: '', fullName: u.fullName, role: u.role, isActive: u.isActive })
+    setForm({ email: u.email, password: '', fullName: u.fullName, role: String(u.role ?? ''), isActive: u.isActive })
     setShowForm(true)
   }
 
@@ -65,31 +65,59 @@ export default function UsersPage() {
     e.preventDefault()
     setError(''); setSuccess('')
     try {
+      // Basic validation
+      if (!form.email.trim()) {
+        setError('Email is required')
+        return
+      }
+      if (!editing && !form.password.trim()) {
+        setError('Password is required')
+        return
+      }
+      if (!form.fullName.trim()) {
+        setError('Full name is required')
+        return
+      }
+      if (!form.role) {
+        setError('Role is required')
+        return
+      }
+
       if (editing) {
         // Example: PUT /api/users/{id}
         // Request: { email, fullName, role, isActive }
         await api.put(`/api/users/${editing.id}`, {
           email: form.email,
           fullName: form.fullName,
-          role: form.role,
+          role: Number(form.role),
           isActive: form.isActive
         })
         setSuccess('User updated')
       } else {
         // Example: POST /api/users
         // Request: { email, password, fullName, role }
-        await api.post('/api/users', {
+        await api.post('/api/users/create', {
           email: form.email,
           password: form.password,
           fullName: form.fullName,
-          role: form.role
+          role: Number(form.role)
         })
         setSuccess('User created')
       }
+
       setShowForm(false)
       refresh()
     } catch (err) {
-      setError(err?.response?.data?.message || 'Save failed')
+      const backendMsg = err?.response?.data?.message || err?.response?.data?.title
+      const modelErrors = err?.response?.data?.errors
+      let detailed = ''
+      if (modelErrors && typeof modelErrors === 'object') {
+        const firstKey = Object.keys(modelErrors)[0]
+        const firstMsgs = Array.isArray(modelErrors[firstKey]) ? modelErrors[firstKey] : []
+        if (firstMsgs.length > 0) detailed = firstMsgs[0]
+      }
+      setError(detailed || backendMsg || 'Save failed')
+
     }
   }
 
@@ -151,8 +179,8 @@ export default function UsersPage() {
                   <div className="mb-3">
                     <label className="form-label">Role</label>
                     <select className="form-select" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-                      <option value="Backoffice">Backoffice</option>
-                      <option value="StationOperator">StationOperator</option>
+                      <option value="1">Backoffice</option>
+                      <option value="2">StationOperator</option>
                     </select>
                   </div>
                   {editing && (
