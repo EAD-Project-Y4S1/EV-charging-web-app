@@ -212,7 +212,20 @@ export default function BookingsPage() {
       setSuccess('Booking cancelled')
       refresh()
     } catch (err) {
-      setError(err?.response?.data?.message || 'Failed to cancel booking')
+      const backendMsg = err?.response?.data?.message || err?.response?.data?.title
+      const msg = backendMsg || 'Cancel allowed only at least 12 hours before reservation'
+      if (window.Swal && typeof window.Swal.fire === 'function') {
+        window.Swal.fire({
+          icon: 'warning',
+          title: 'Cannot cancel booking',
+          text: msg,
+          confirmButtonText: 'OK'
+        })
+      } else if (window.Sweetalert2 && typeof window.Sweetalert2.fire === 'function') {
+        window.Sweetalert2.fire('Cannot cancel booking', msg, 'warning')
+      } else {
+        setError(msg)
+      }
     }
   }
 
@@ -415,7 +428,6 @@ export default function BookingsPage() {
                       </span>
                     </td>
                     <td className="text-end">
-                      <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => onEdit(b)}>Edit</button>
                       <button className="btn btn-sm btn-outline-warning me-2" onClick={() => onCancel(b)}>Cancel</button>
                     </td>
                   </tr>
