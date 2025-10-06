@@ -14,7 +14,26 @@ export default function BookingsPage() {
   const [success, setSuccess] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ ownerNIC: '', stationId: '', reservationDateTime: '' })
+  const [form, setForm] = useState({
+    reservationId: '',
+    userId: '',
+    userNic: '',
+    stationName: '',
+    vehicleNumber: '',
+    vehicleModel: '',
+    batteryCapacity: '',
+    currentBattery: '',
+    targetBattery: '',
+    contactNumber: '',
+    reservationDate: '',
+    reservationTime: '',
+    duration: '',
+    priority: '',
+    paymentMethod: '',
+    specialRequirements: '',
+    estimatedCost: '',
+    sid: ''
+  })
   const [selectedStationId, setSelectedStationId] = useState('')
   const [selectedOwnerNIC, setSelectedOwnerNIC] = useState('')
   const [loadingMode, setLoadingMode] = useState('none') // 'station', 'owner', 'none'
@@ -22,6 +41,20 @@ export default function BookingsPage() {
   useEffect(() => { 
     loadStations()
   }, [])
+
+  async function loadAllBookings() {
+    setError(''); setSuccess('')
+    setLoadingMode('none')
+    try {
+      const res = await api.get('/api/bookings')
+      setBookings(res.data)
+      setSelectedStationId('')
+      setSelectedOwnerNIC('')
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Failed to load all bookings')
+      setBookings([])
+    }
+  }
 
   // Debug function to test booking creation
   async function testBookingCreation() {
@@ -119,19 +152,55 @@ export default function BookingsPage() {
 
   function onAdd() {
     setEditing(null)
-    // Set default reservation time to tomorrow at 10 AM
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
-    tomorrow.setHours(10, 0, 0, 0)
-    const defaultDateTime = tomorrow.toISOString().slice(0, 16) // Format for datetime-local input
-    
-    setForm({ ownerNIC: '', stationId: '', reservationDateTime: defaultDateTime })
+    const defaultDate = tomorrow.toISOString().slice(0, 10)
+    const defaultTime = '10:00'
+    setForm({
+      reservationId: '',
+      userId: '',
+      userNic: '',
+      stationName: '',
+      vehicleNumber: '',
+      vehicleModel: '',
+      batteryCapacity: '',
+      currentBattery: '',
+      targetBattery: '',
+      contactNumber: '',
+      reservationDate: defaultDate,
+      reservationTime: defaultTime,
+      duration: '',
+      priority: '',
+      paymentMethod: '',
+      specialRequirements: '',
+      estimatedCost: '',
+      sid: ''
+    })
     setShowForm(true)
   }
 
   function onEdit(b) {
     setEditing(b)
-    setForm({ ownerNIC: b.ownerNIC, stationId: b.stationId, reservationDateTime: b.reservationDateTime?.slice(0,16) || '' })
+    setForm({
+      reservationId: b.reservationId || '',
+      userId: String(b.userId ?? ''),
+      userNic: b.userNic || b.ownerNIC || '',
+      stationName: b.stationName || '',
+      vehicleNumber: b.vehicleNumber || '',
+      vehicleModel: b.vehicleModel || '',
+      batteryCapacity: b.batteryCapacity || '',
+      currentBattery: b.currentBattery || '',
+      targetBattery: b.targetBattery || '',
+      contactNumber: b.contactNumber || '',
+      reservationDate: b.reservationDate || (b.reservationDateTime ? new Date(b.reservationDateTime).toISOString().slice(0,10) : ''),
+      reservationTime: b.reservationTime || (b.reservationDateTime ? new Date(b.reservationDateTime).toISOString().slice(11,16) : ''),
+      duration: b.duration || '',
+      priority: b.priority || '',
+      paymentMethod: b.paymentMethod || '',
+      specialRequirements: b.specialRequirements || '',
+      estimatedCost: b.estimatedCost || '',
+      sid: String(b.sid ?? '')
+    })
     setShowForm(true)
   }
 
@@ -151,24 +220,30 @@ export default function BookingsPage() {
     e.preventDefault()
     setError(''); setSuccess('')
     
-    // Validation
-    if (!form.ownerNIC.trim()) {
-      setError('Owner NIC is required')
-      return
-    }
-    
-    if (!form.stationId) {
-      setError('Station selection is required')
-      return
-    }
-    
-    if (!form.reservationDateTime) {
-      setError('Reservation date and time is required')
-      return
+    // Validation for required backend fields
+    const requiredFields = [
+      ['reservationId', 'Reservation ID'],
+      ['userId', 'User ID'],
+      ['stationName', 'Station'],
+      ['vehicleNumber', 'Vehicle Number'],
+      ['vehicleModel', 'Vehicle Model'],
+      ['contactNumber', 'Contact Number'],
+      ['reservationDate', 'Reservation Date'],
+      ['reservationTime', 'Reservation Time'],
+      ['duration', 'Duration'],
+      ['priority', 'Priority'],
+      ['paymentMethod', 'Payment Method'],
+      ['estimatedCost', 'Estimated Cost']
+    ]
+    for (const [key, label] of requiredFields) {
+      if (!String(form[key] || '').trim()) {
+        setError(`${label} is required`)
+        return
+      }
     }
     
     // Validate reservation datetime according to business rules
-    const reservationDate = new Date(form.reservationDateTime)
+    const reservationDate = new Date(`${form.reservationDate}T${form.reservationTime}`)
     const now = new Date()
     const sevenDaysFromNow = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000))
     
@@ -183,55 +258,33 @@ export default function BookingsPage() {
     }
     
     try {
-      // Prepare datetime in ISO format
-      const dateValue = new Date(form.reservationDateTime)
-      
-      // Try different payload formats
-      const payloadOptions = [
-        // Option 1: camelCase (JavaScript standard)
-        {
-          ownerNIC: form.ownerNIC.trim(),
-          stationId: form.stationId,
-          reservationDateTime: dateValue.toISOString()
-        },
-        // Option 2: PascalCase (C# standard)
-        {
-          OwnerNIC: form.ownerNIC.trim(),
-          StationId: form.stationId,
-          ReservationDateTime: dateValue.toISOString()
-        }
-      ]
-      
-      let success = false
-      let lastError = null
-      
-      for (let i = 0; i < payloadOptions.length && !success; i++) {
-        const payload = payloadOptions[i]
-        console.log(`Attempt ${i + 1} - Submitting booking with payload:`, payload)
-        
-        try {
-          if (editing) {
-            // Example: PUT /api/bookings/{id}
-            const updatePayload = { ...payload, id: editing.id }
-            console.log('Updating booking:', updatePayload)
-            await api.put(`/api/bookings/${editing.id}`, updatePayload)
-            setSuccess('Booking updated')
-            success = true
-          } else {
-            // Example: POST /api/bookings/create
-            console.log('Creating booking:', payload)
-            await api.post('/api/bookings/create', payload)
-            setSuccess('Booking created')
-            success = true
-          }
-        } catch (err) {
-          console.error(`Attempt ${i + 1} failed:`, err.response?.data)
-          lastError = err
-        }
+      const payload = {
+        ReservationId: form.reservationId.trim(),
+        UserId: Number(form.userId),
+        UserNic: form.userNic.trim() || null,
+        StationName: form.stationName.trim(),
+        VehicleNumber: form.vehicleNumber.trim(),
+        VehicleModel: form.vehicleModel.trim(),
+        BatteryCapacity: form.batteryCapacity.trim() || null,
+        CurrentBattery: form.currentBattery.trim() || null,
+        TargetBattery: form.targetBattery.trim() || null,
+        ContactNumber: form.contactNumber.trim(),
+        ReservationDate: form.reservationDate,
+        ReservationTime: form.reservationTime,
+        Duration: form.duration.trim(),
+        Priority: form.priority.trim(),
+        PaymentMethod: form.paymentMethod.trim(),
+        SpecialRequirements: form.specialRequirements.trim() || null,
+        EstimatedCost: form.estimatedCost.trim(),
+        Sid: form.sid ? Number(form.sid) : null
       }
-      
-      if (!success && lastError) {
-        throw lastError
+
+      if (editing) {
+        await api.put(`/api/bookings/${editing.id}`, { ...payload, Id: editing.id })
+        setSuccess('Booking updated')
+      } else {
+        await api.post('/api/bookings/create', payload)
+        setSuccess('Booking created')
       }
       setShowForm(false)
       refresh()
@@ -259,6 +312,7 @@ export default function BookingsPage() {
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h3>Bookings</h3>
         <div>
+          <button className="btn btn-outline-secondary me-2" onClick={loadAllBookings}>Load All</button>
           <button className="btn btn-outline-info me-2" onClick={testBookingCreation}>Test Backend</button>
           <button className="btn btn-primary" onClick={onAdd}>Add Booking</button>
         </div>
@@ -345,15 +399,16 @@ export default function BookingsPage() {
               </tr>
             ) : (
               bookings.map(b => {
+                const ownerNic = b.ownerNIC || b.userNic || ''
                 const station = stations.find(s => s.id === b.stationId)
-                const reservationDate = new Date(b.reservationDateTime)
+                const stationLabel = b.stationName || (station ? `${station.location} (${station.type === 1 ? 'AC' : 'DC'})` : (b.stationId || ''))
+                const reservationIso = b.reservationDateTime || (b.reservationDate && b.reservationTime ? `${b.reservationDate} ${b.reservationTime}` : null)
+                const reservationDate = reservationIso ? new Date(reservationIso) : new Date('')
                 return (
                   <tr key={b.id}>
-                    <td>{b.ownerNIC}</td>
-                    <td>
-                      {station ? `${station.location} (${station.type === 1 ? 'AC' : 'DC'})` : b.stationId}
-                    </td>
-                    <td>{reservationDate.toLocaleString()}</td>
+                    <td>{ownerNic}</td>
+                    <td>{stationLabel}</td>
+                    <td>{isNaN(reservationDate.getTime()) ? '-' : reservationDate.toLocaleString()}</td>
                     <td>
                       <span className={`badge ${b.status === 'Active' || b.status === 1 ? 'bg-success' : 'bg-warning'}`}>
                         {b.status}
@@ -382,47 +437,110 @@ export default function BookingsPage() {
               </div>
               <form onSubmit={onSubmit}>
                 <div className="modal-body">
-                  <Input label="Owner NIC" value={form.ownerNIC} onChange={(e) => setForm({ ...form, ownerNIC: e.target.value })} required placeholder="Owner NIC" />
+                  <div className="row g-3">
+                    <div className="col-md-4">
+                      <Input label="Reservation ID" value={form.reservationId} onChange={(e) => setForm({ ...form, reservationId: e.target.value })} required placeholder="Reservation ID" />
+                    </div>
+                    <div className="col-md-4">
+                      <Input label="User ID" value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} required placeholder="User ID (number)" />
+                    </div>
+                    <div className="col-md-4">
+                      <Input label="Owner NIC (optional)" value={form.userNic} onChange={(e) => setForm({ ...form, userNic: e.target.value })} placeholder="Owner NIC" />
+                    </div>
+                  </div>
                   
                   <div className="mb-3">
                     <label className="form-label">Station</label>
                     <select 
                       className="form-select" 
-                      value={form.stationId} 
-                      onChange={(e) => setForm({ ...form, stationId: e.target.value })}
+                      value={form.stationName} 
+                      onChange={(e) => setForm({ ...form, stationName: e.target.value })}
                       required
                     >
                       <option value="">Select a station...</option>
                       {stations.map(station => (
-                        <option key={station.id} value={station.id}>
+                        <option key={station.id} value={station.location}>
                           {station.location} ({station.type === 1 ? 'AC' : 'DC'})
                         </option>
                       ))}
                     </select>
                   </div>
                   
-                  <div className="mb-3">
-                    <label className="form-label">Reservation Date & Time</label>
-                    <input 
-                      type="datetime-local" 
-                      className="form-control" 
-                      value={form.reservationDateTime} 
-                      onChange={(e) => setForm({ ...form, reservationDateTime: e.target.value })} 
-                      min={(() => {
-                        const now = new Date()
-                        now.setMinutes(now.getMinutes() + 30) // Add 30 minutes buffer
-                        return now.toISOString().slice(0, 16)
-                      })()} 
-                      max={(() => {
-                        const sevenDays = new Date()
-                        sevenDays.setDate(sevenDays.getDate() + 7)
-                        return sevenDays.toISOString().slice(0, 16)
-                      })()}
-                      required 
-                    />
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label">Reservation Date</label>
+                      <input 
+                        type="date" 
+                        className="form-control" 
+                        value={form.reservationDate} 
+                        onChange={(e) => setForm({ ...form, reservationDate: e.target.value })} 
+                        required 
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label">Reservation Time</label>
+                      <input 
+                        type="time" 
+                        className="form-control" 
+                        value={form.reservationTime} 
+                        onChange={(e) => setForm({ ...form, reservationTime: e.target.value })} 
+                        required 
+                      />
+                    </div>
                     <small className="form-text text-muted">
                       Reservation must be in the future and within the next 7 days
                     </small>
+                  </div>
+
+                  <div className="row g-3 mt-1">
+                    <div className="col-md-6">
+                      <Input label="Vehicle Number" value={form.vehicleNumber} onChange={(e) => setForm({ ...form, vehicleNumber: e.target.value })} required placeholder="Vehicle Number" />
+                    </div>
+                    <div className="col-md-6">
+                      <Input label="Vehicle Model" value={form.vehicleModel} onChange={(e) => setForm({ ...form, vehicleModel: e.target.value })} required placeholder="Vehicle Model" />
+                    </div>
+                  </div>
+
+                  <div className="row g-3 mt-1">
+                    <div className="col-md-4">
+                      <Input label="Battery Capacity (optional)" value={form.batteryCapacity} onChange={(e) => setForm({ ...form, batteryCapacity: e.target.value })} placeholder="e.g., 60 kWh" />
+                    </div>
+                    <div className="col-md-4">
+                      <Input label="Current Battery (optional)" value={form.currentBattery} onChange={(e) => setForm({ ...form, currentBattery: e.target.value })} placeholder="e.g., 30%" />
+                    </div>
+                    <div className="col-md-4">
+                      <Input label="Target Battery (optional)" value={form.targetBattery} onChange={(e) => setForm({ ...form, targetBattery: e.target.value })} placeholder="e.g., 80%" />
+                    </div>
+                  </div>
+
+                  <div className="row g-3 mt-1">
+                    <div className="col-md-6">
+                      <Input label="Contact Number" value={form.contactNumber} onChange={(e) => setForm({ ...form, contactNumber: e.target.value })} required placeholder="Contact Number" />
+                    </div>
+                    <div className="col-md-6">
+                      <Input label="Duration" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} required placeholder="e.g., 1h 30m" />
+                    </div>
+                  </div>
+
+                  <div className="row g-3 mt-1">
+                    <div className="col-md-4">
+                      <Input label="Priority" value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} required placeholder="e.g., Normal/Urgent" />
+                    </div>
+                    <div className="col-md-4">
+                      <Input label="Payment Method" value={form.paymentMethod} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })} required placeholder="e.g., Cash/Card" />
+                    </div>
+                    <div className="col-md-4">
+                      <Input label="Estimated Cost" value={form.estimatedCost} onChange={(e) => setForm({ ...form, estimatedCost: e.target.value })} required placeholder="e.g., 1500" />
+                    </div>
+                  </div>
+
+                  <div className="row g-3 mt-1">
+                    <div className="col-md-8">
+                      <Input label="Special Requirements (optional)" value={form.specialRequirements} onChange={(e) => setForm({ ...form, specialRequirements: e.target.value })} placeholder="Any notes" />
+                    </div>
+                    <div className="col-md-4">
+                      <Input label="SID (optional)" value={form.sid} onChange={(e) => setForm({ ...form, sid: e.target.value })} placeholder="Numeric SID" />
+                    </div>
                   </div>
                 </div>
                 <div className="modal-footer">
