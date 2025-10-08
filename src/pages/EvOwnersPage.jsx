@@ -127,7 +127,7 @@ export default function EvOwnersPage() {
               <th>Email</th>
               <th>Phone</th>
               <th>Status</th>
-              <th></th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -138,10 +138,12 @@ export default function EvOwnersPage() {
                 <td>{o.email}</td>
                 <td>{o.phone}</td>
                 <td>{statusLabel(o.status)}</td>
-                <td className="text-end">
-                  <button className="btn btn-sm btn-outline-light me-2" onClick={() => onEdit(o)}>Edit</button>
-                  <button className="btn btn-sm btn-outline-warning me-2" onClick={() => onToggle(o)}>{statusLabel(o.status) === 'Active' ? 'Deactivate' : 'Activate'}</button>
-                  <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(o)}>Delete</button>
+                <td className="text-center">
+                  <div className="d-flex justify-content-center align-items-center gap-2">
+                    <button className="btn btn-sm btn-outline-primary" onClick={() => onEdit(o)}>Edit</button>
+                    <button className="btn btn-sm btn-outline-warning" onClick={() => onToggle(o)}>{statusLabel(o.status) === 'Active' ? 'Deactivate' : 'Activate'}</button>
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(o)}>Delete</button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -151,22 +153,23 @@ export default function EvOwnersPage() {
       </div>
 
       {showForm && (
+        <>
         <div className="modal d-block" tabIndex="-1" role="dialog">
           <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div className="modal-content">
+            <div className="modal-content" style={{borderRadius:12, border:'1px solid #e5e7eb', boxShadow:'0 12px 32px rgba(0,0,0,0.15)'}}>
               <div className="modal-header">
                 <h5 className="modal-title">{editing ? 'Edit Owner' : 'Add Owner'}</h5>
                 <button type="button" className="btn-close" onClick={() => setShowForm(false)}></button>
               </div>
               <form onSubmit={onSubmit}>
-                <div className="modal-body">
+                <div className="modal-body p-4">
                   <Input label="NIC" value={form.nic} onChange={(e) => setForm({ ...form, nic: e.target.value })} required placeholder="NIC" />
                   <Input label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Owner name" />
                   <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email(optional)" />
                   <Input label="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="phone(optional)" />
                   <Input label="Vehicle Details" value={form.vehicleDetails} onChange={(e) => setForm({ ...form, vehicleDetails: e.target.value })} placeholder="vehicle(optional)" />
                 </div>
-                <div className="modal-footer">
+                <div className="modal-footer px-4">
                   <button type="button" className="btn btn-outline-light" onClick={() => setShowForm(false)}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Save</button>
                 </div>
@@ -174,6 +177,8 @@ export default function EvOwnersPage() {
             </div>
           </div>
         </div>
+        <div className="modal-backdrop fade show"></div>
+        </>
       )}
     </div>
   )

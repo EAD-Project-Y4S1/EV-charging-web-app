@@ -21,9 +21,8 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    
+
     try {
-      // Delegate authentication to AuthContext
       await login({ email: form.email, password: form.password })
       navigate('/')
     } catch (err) {
@@ -40,60 +39,107 @@ export default function LoginPage() {
       setLoading(false)
     }
   }
-   
+
   return (
-    <div className="container d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
-      <div className="ev-card" style={{ maxWidth: 420, width: '100%' }}>
-        <div className="card-body">
-          <div className="text-center mb-3">
-            <div className="ev-badge">EV Charging</div>
+    <div
+      className="d-flex align-items-center justify-content-center"
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #007BFF 0%, #0056b3 100%)',
+        color: '#fff',
+      }}
+    >
+      <div
+        className="card shadow-lg border-0"
+        style={{
+          width: '100%',
+          maxWidth: 420,
+          borderRadius: '16px',
+          background: '#ffffff',
+          color: '#000',
+          padding: '32px 28px',
+        }}
+      >
+        <div className="text-center mb-4">
+          <div
+            className="fw-bold"
+            style={{
+              fontSize: '1.6rem',
+              color: '#007BFF',
+              letterSpacing: '0.5px',
+            }}
+          >
+            EV Charging Portal
           </div>
-          <h5 className="card-title mb-3 ev-page-title">Sign in</h5>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label">Email address</label>
-              <input
-                type="email"
-                className="form-control"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
-                placeholder="Enter your email"
-                disabled={loading}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Password</label>
-              <input
-                type="password"
-                className="form-control"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-                disabled={loading}
-              />
-            </div>
-            {error && (
-              <div className="alert alert-danger py-2" role="alert">
-                {error}
-              </div>
-            )}
-            <button 
-              className="btn btn-primary w-100" 
-              type="submit"
+          <p className="text-muted mb-0">Access your dashboard securely</p>
+        </div>
+
+        <h5 className="text-center mb-3 fw-semibold">Sign in</h5>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Email Address</label>
+            <input
+              type="email"
+              className="form-control"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              required
+              placeholder="Enter your email"
               disabled={loading}
-            >
-              {loading ? 'Signing in...' : 'Login'}
-            </button>
-          </form>
-          
-          {/* Default credentials info for development */}
-          <div className="mt-3 p-2" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 8 }}>
-            <small className="ev-subtitle">
-              <strong>Default Admin Credentials:</strong><br />
-              Email: admin@evcs.local<br />
-              Password: Admin#12345
-            </small>
+              style={{ borderRadius: '10px', padding: '10px 12px' }}
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Password</label>
+            <input
+              type="password"
+              className="form-control"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+              disabled={loading}
+              style={{ borderRadius: '10px', padding: '10px 12px' }}
+            />
+          </div>
+
+          {error && (
+            <div className="alert alert-danger py-2 text-center" role="alert">
+              {error}
+            </div>
+          )}
+
+          <button
+            className="btn w-100 fw-bold"
+            type="submit"
+            disabled={loading}
+            style={{
+              backgroundColor: '#007BFF',
+              color: '#fff',
+              borderRadius: '10px',
+              padding: '10px 0',
+              transition: 'all 0.3s ease',
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = '#0056b3')}
+            onMouseOut={(e) => (e.target.style.backgroundColor = '#007BFF')}
+          >
+            {loading ? 'Signing in...' : 'Login'}
+          </button>
+        </form>
+
+        <div
+          className="mt-4 text-center"
+          style={{
+            fontSize: '0.85rem',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '8px',
+            padding: '10px',
+          }}
+        >
+          <strong>Default Admin Credentials:</strong>
+          <div className="text-muted mt-1">
+            Email: admin@evcs.local <br />
+            Password: Admin#12345
           </div>
         </div>
       </div>

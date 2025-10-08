@@ -375,8 +375,10 @@ export default function BookingsPage() {
                           {statusLabel}
                         </span>
                       </td>
-                      <td className="text-end">
-                        <button className="btn btn-sm btn-outline-warning me-2" onClick={() => onCancel(b)}>Cancel</button>
+                      <td className="text-center">
+                        <div className="d-flex justify-content-center align-items-center gap-2">
+                          <button className="btn btn-sm btn-outline-warning" onClick={() => onCancel(b)}>Cancel</button>
+                        </div>
                       </td>
                     </tr>
                   )
@@ -388,15 +390,16 @@ export default function BookingsPage() {
       </div>
 
       {showForm && (
+        <>
         <div className="modal d-block" tabIndex="-1" role="dialog">
           <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div className="modal-content">
+            <div className="modal-content" style={{borderRadius:12, border:'1px solid #e5e7eb', boxShadow:'0 12px 32px rgba(0,0,0,0.15)'}}>
               <div className="modal-header">
                 <h5 className="modal-title">{editing ? 'Edit Booking' : 'Add Booking'}</h5>
                 <button type="button" className="btn-close" onClick={() => setShowForm(false)}></button>
               </div>
               <form onSubmit={onSubmit}>
-                <div className="modal-body">
+                <div className="modal-body p-4">
                   <div className="row g-3">
                     <div className="col-md-4">
                       <Input label="Reservation ID" value={form.reservationId} onChange={(e) => setForm({ ...form, reservationId: e.target.value })} required placeholder="Reservation ID" />
@@ -503,7 +506,7 @@ export default function BookingsPage() {
                     </div>
                   </div>
                 </div>
-                <div className="modal-footer">
+                <div className="modal-footer px-4">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Save</button>
                 </div>
@@ -511,6 +514,8 @@ export default function BookingsPage() {
             </div>
           </div>
         </div>
+        <div className="modal-backdrop fade show"></div>
+        </>
       )}
     </div>
   )

@@ -140,7 +140,7 @@ export default function UsersPage() {
               <th>Full Name</th>
               <th>Role</th>
               <th>Status</th>
-              <th></th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -148,11 +148,13 @@ export default function UsersPage() {
               <tr key={u.id}>
                 <td>{u.email}</td>
                 <td>{u.fullName}</td>
-                <td>{u.role}</td>
+                <td>{u.role === 1 || u.role === '1' ? 'Back office (1)' : u.role === 2 || u.role === '2' ? 'Station operator (2)' : u.role}</td>
                 <td>{u.isActive ? 'Active' : 'Inactive'}</td>
-                <td className="text-end">
-                  <button className="btn btn-sm btn-outline-light me-2" onClick={() => onEdit(u)}>Edit</button>
-                  <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(u)}>Delete</button>
+                <td className="text-center">
+                  <div className="d-flex justify-content-center align-items-center gap-2">
+                    <button className="btn btn-sm btn-outline-primary" onClick={() => onEdit(u)}>Edit</button>
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(u)}>Delete</button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -162,15 +164,16 @@ export default function UsersPage() {
       </div>
 
       {showForm && (
+        <>
         <div className="modal d-block" tabIndex="-1" role="dialog">
           <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div className="modal-content">
+            <div className="modal-content" style={{borderRadius:12, border:'1px solid #e5e7eb', boxShadow:'0 12px 32px rgba(0,0,0,0.15)'}}>
               <div className="modal-header">
                 <h5 className="modal-title">{editing ? 'Edit User' : 'Add User'}</h5>
                 <button type="button" className="btn-close" onClick={() => setShowForm(false)}></button>
               </div>
               <form onSubmit={onSubmit}>
-                <div className="modal-body">
+                <div className="modal-body p-4">
                   <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required placeholder="user@example.com" />
                   {!editing && (
                     <Input label="Password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required placeholder="Password" />
@@ -190,7 +193,7 @@ export default function UsersPage() {
                     </div>
                   )}
                 </div>
-                <div className="modal-footer">
+                <div className="modal-footer px-4">
                   <button type="button" className="btn btn-outline-light" onClick={() => setShowForm(false)}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Save</button>
                 </div>
@@ -198,6 +201,8 @@ export default function UsersPage() {
             </div>
           </div>
         </div>
+        <div className="modal-backdrop fade show"></div>
+        </>
       )}
     </div>
   )

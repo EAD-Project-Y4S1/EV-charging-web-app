@@ -216,7 +216,7 @@ export default function StationsPage() {
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h3 className="ev-page-title m-0">Charging Stations</h3>
         <div>
-          <button className="btn btn-outline-primary me-2" onClick={testBackendValidation}>Test Backend</button>
+          {/* <button className="btn btn-outline-primary me-2" onClick={testBackendValidation}>Test Backend</button> */}
           <button className="btn btn-primary" onClick={onAdd}>Add Station</button>
         </div>
       </div>
@@ -231,7 +231,7 @@ export default function StationsPage() {
               <th>Type</th>
               <th>Slots</th>
               <th>Status</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -241,14 +241,16 @@ export default function StationsPage() {
                 <td>{s.type === 1 ? 'AC' : s.type === 2 ? 'DC' : s.type}</td>
                 <td>{s.slotsAvailable}</td>
                 <td>{s.status === 1 ? 'Active' : 'Inactive'}</td>
-                <td className="text-end">
-                  <button className="btn btn-sm btn-outline-light me-2" onClick={() => onEdit(s)}>Edit</button>
-                  {s.status === 1 ? (
-                    <button className="btn btn-sm btn-outline-warning me-2" onClick={() => onDeactivate(s)}>Deactivate</button>
-                  ) : (
-                    <button className="btn btn-sm btn-outline-success me-2" onClick={() => onActivate(s)}>Activate</button>
-                  )}
-                  <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(s)}>Delete</button>
+                <td className="text-center">
+                  <div className="d-flex justify-content-center align-items-center gap-2">
+                    <button className="btn btn-sm btn-outline-primary" onClick={() => onEdit(s)}>Edit</button>
+                    {s.status === 1 ? (
+                      <button className="btn btn-sm btn-outline-warning" onClick={() => onDeactivate(s)}>Deactivate</button>
+                    ) : (
+                      <button className="btn btn-sm btn-outline-success" onClick={() => onActivate(s)}>Activate</button>
+                    )}
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(s)}>Delete</button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -258,15 +260,16 @@ export default function StationsPage() {
       </div>
 
       {showForm && (
+        <>
         <div className="modal d-block" tabIndex="-1" role="dialog">
           <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div className="modal-content">
+            <div className="modal-content" style={{borderRadius:12, border:'1px solid #e5e7eb', boxShadow:'0 12px 32px rgba(0,0,0,0.15)'}}>
               <div className="modal-header">
                 <h5 className="modal-title">{editing ? 'Edit Station' : 'Add Station'}</h5>
                 <button type="button" className="btn-close" onClick={() => setShowForm(false)}></button>
               </div>
               <form onSubmit={onSubmit}>
-                <div className="modal-body">
+                <div className="modal-body p-4">
                   <Input label="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} required placeholder="Location" />
                   <div className="mb-3">
                     <label className="form-label">Type</label>
@@ -281,7 +284,7 @@ export default function StationsPage() {
                     <textarea className="form-control" rows="4" value={scheduleInput} onChange={(e) => setScheduleInput(e.target.value)} placeholder="Mon 09:00-17:00\nTue 09:00-17:00"></textarea>
                   </div>
                 </div>
-                <div className="modal-footer">
+                <div className="modal-footer px-4">
                   <button type="button" className="btn btn-outline-light" onClick={() => setShowForm(false)}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Save</button>
                 </div>
@@ -289,6 +292,8 @@ export default function StationsPage() {
             </div>
           </div>
         </div>
+        <div className="modal-backdrop fade show"></div>
+        </>
       )}
     </div>
   )
