@@ -40,6 +40,7 @@ export default function BookingsPage() {
 
   useEffect(() => { 
     loadStations()
+    loadAllBookings()
   }, [])
 
   async function loadAllBookings() {
@@ -323,118 +324,65 @@ export default function BookingsPage() {
     // Full-width content container with padding
     <div className="mt-4 p-3 p-md-4">
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <h3>Bookings</h3>
+        <h3 className="ev-page-title m-0">Bookings</h3>
         <div>
-          <button className="btn btn-outline-secondary me-2" onClick={loadAllBookings}>Load All</button>
-          <button className="btn btn-outline-info me-2" onClick={testBookingCreation}>Test Backend</button>
           <button className="btn btn-primary" onClick={onAdd}>Add Booking</button>
-        </div>
-      </div>
-      
-      {/* Filter Controls */}
-      <div className="card mb-3">
-        <div className="card-body">
-          <h6 className="card-title">Load Bookings</h6>
-          <div className="row g-3">
-            <div className="col-md-5">
-              <label className="form-label">By Station</label>
-              <div className="d-flex">
-                <select 
-                  className="form-select me-2" 
-                  value={selectedStationId} 
-                  onChange={(e) => setSelectedStationId(e.target.value)}
-                >
-                  <option value="">Select a station...</option>
-                  {stations.map(station => (
-                    <option key={station.id} value={station.id}>
-                      {station.location} ({station.type === 1 ? 'AC' : 'DC'})
-                    </option>
-                  ))}
-                </select>
-                <button 
-                  className="btn btn-outline-primary" 
-                  onClick={() => loadBookingsByStation(selectedStationId)}
-                  disabled={!selectedStationId}
-                >
-                  Load
-                </button>
-              </div>
-            </div>
-            <div className="col-md-2 d-flex align-items-center justify-content-center">
-              <span className="text-muted">OR</span>
-            </div>
-            <div className="col-md-5">
-              <label className="form-label">By Owner NIC</label>
-              <div className="d-flex">
-                <input 
-                  type="text" 
-                  className="form-control me-2" 
-                  placeholder="Enter Owner NIC" 
-                  value={selectedOwnerNIC}
-                  onChange={(e) => setSelectedOwnerNIC(e.target.value)}
-                />
-                <button 
-                  className="btn btn-outline-primary" 
-                  onClick={() => loadBookingsByOwner(selectedOwnerNIC)}
-                  disabled={!selectedOwnerNIC}
-                >
-                  Load
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       
       <Toast type={error ? 'error' : 'success'} message={error || success} />
 
-      <div className="card shadow-sm">
+      <div className="ev-card">
         <div className="table-responsive">
           <table className="table table-striped mb-0">
-          <thead>
-            <tr>
-              <th>Owner NIC</th>
-              <th>Station</th>
-              <th>Reservation Date & Time</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bookings.length === 0 ? (
+            <thead>
               <tr>
-                <td colSpan="5" className="text-center text-muted py-4">
-                  {loadingMode === 'none' ? 
-                    'Select a station or enter an owner NIC to load bookings' : 
-                    'No bookings found'
-                  }
-                </td>
+                <th>Owner NIC</th>
+                <th>Station</th>
+                <th>Reservation Date & Time</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ) : (
-              bookings.map(b => {
-                const ownerNic = b.ownerNIC || b.userNic || ''
-                const station = stations.find(s => s.id === b.stationId)
-                const stationLabel = b.stationName || (station ? `${station.location} (${station.type === 1 ? 'AC' : 'DC'})` : (b.stationId || ''))
-                const reservationIso = b.reservationDateTime || (b.reservationDate && b.reservationTime ? `${b.reservationDate} ${b.reservationTime}` : null)
-                const reservationDate = reservationIso ? new Date(reservationIso) : new Date('')
-                return (
-                  <tr key={b.id}>
-                    <td>{ownerNic}</td>
-                    <td>{stationLabel}</td>
-                    <td>{isNaN(reservationDate.getTime()) ? '-' : reservationDate.toLocaleString()}</td>
-                    <td>
-                      <span className={`badge ${b.status === 'Active' || b.status === 1 ? 'bg-success' : 'bg-warning'}`}>
-                        {b.status}
-                      </span>
-                    </td>
-                    <td className="text-end">
-                      <button className="btn btn-sm btn-outline-warning me-2" onClick={() => onCancel(b)}>Cancel</button>
-                    </td>
-                  </tr>
-                )
-              })
-            )}
-          </tbody>
+            </thead>
+            <tbody>
+              {bookings.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="text-center text-muted py-4">
+                    No bookings found
+                  </td>
+                </tr>
+              ) : (
+                bookings.map(b => {
+                  const ownerNic = b.ownerNIC || b.userNic || ''
+                  const station = stations.find(s => s.id === b.stationId)
+                  const stationLabel = b.stationName || (station ? `${station.location} (${station.type === 1 ? 'AC' : 'DC'})` : (b.stationId || ''))
+                  const reservationIso = b.reservationDateTime || (b.reservationDate && b.reservationTime ? `${b.reservationDate} ${b.reservationTime}` : null)
+                  const reservationDate = reservationIso ? new Date(reservationIso) : new Date('')
+                  const statusLabel = (() => {
+                    const s = b.status
+                    if (s === 1 || s === '1' || s === 'Confirmed' || s === 'confirmed') return 'confirmed'
+                    if (s === 2 || s === '2' || s === 'Completed' || s === 'completed') return 'completed'
+                    if (s === 3 || s === '3' || s === 'Cancelled' || s === 'cancelled') return 'cancelled'
+                    return String(s || '').toLowerCase() || '-'
+                  })()
+                  return (
+                    <tr key={b.id}>
+                      <td>{ownerNic}</td>
+                      <td>{stationLabel}</td>
+                      <td>{isNaN(reservationDate.getTime()) ? '-' : reservationDate.toLocaleString()}</td>
+                      <td>
+                        <span className={`badge ${statusLabel === 'confirmed' ? 'bg-primary' : statusLabel === 'completed' ? 'bg-success' : statusLabel === 'cancelled' ? 'bg-danger' : 'bg-secondary'}`}>
+                          {statusLabel}
+                        </span>
+                      </td>
+                      <td className="text-end">
+                        <button className="btn btn-sm btn-outline-warning me-2" onClick={() => onCancel(b)}>Cancel</button>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
           </table>
         </div>
       </div>

@@ -214,15 +214,15 @@ export default function StationsPage() {
     // Full-width content container with padding
     <div className="mt-4 p-3 p-md-4">
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <h3>Charging Stations</h3>
+        <h3 className="ev-page-title m-0">Charging Stations</h3>
         <div>
-          <button className="btn btn-outline-info me-2" onClick={testBackendValidation}>Test Backend</button>
+          <button className="btn btn-outline-primary me-2" onClick={testBackendValidation}>Test Backend</button>
           <button className="btn btn-primary" onClick={onAdd}>Add Station</button>
         </div>
       </div>
       <Toast type={error ? 'error' : 'success'} message={error || success} />
 
-      <div className="card shadow-sm">
+      <div className="ev-card">
         <div className="table-responsive">
           <table className="table table-striped mb-0">
           <thead>
@@ -242,7 +242,7 @@ export default function StationsPage() {
                 <td>{s.slotsAvailable}</td>
                 <td>{s.status === 1 ? 'Active' : 'Inactive'}</td>
                 <td className="text-end">
-                  <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => onEdit(s)}>Edit</button>
+                  <button className="btn btn-sm btn-outline-light me-2" onClick={() => onEdit(s)}>Edit</button>
                   {s.status === 1 ? (
                     <button className="btn btn-sm btn-outline-warning me-2" onClick={() => onDeactivate(s)}>Deactivate</button>
                   ) : (
@@ -282,7 +282,7 @@ export default function StationsPage() {
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
+                  <button type="button" className="btn btn-outline-light" onClick={() => setShowForm(false)}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Save</button>
                 </div>
               </form>

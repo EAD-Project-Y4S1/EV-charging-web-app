@@ -126,12 +126,12 @@ export default function UsersPage() {
     // Full-width content container with padding
     <div className="mt-4 p-3 p-md-4">
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <h3>Users</h3>
+        <h3 className="ev-page-title m-0">Users</h3>
         <button className="btn btn-primary" onClick={onAdd}>Add User</button>
       </div>
       <Toast type={error ? 'error' : 'success'} message={error || success} />
 
-      <div className="card shadow-sm">
+      <div className="ev-card">
         <div className="table-responsive">
           <table className="table table-striped mb-0">
           <thead>
@@ -151,7 +151,7 @@ export default function UsersPage() {
                 <td>{u.role}</td>
                 <td>{u.isActive ? 'Active' : 'Inactive'}</td>
                 <td className="text-end">
-                  <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => onEdit(u)}>Edit</button>
+                  <button className="btn btn-sm btn-outline-light me-2" onClick={() => onEdit(u)}>Edit</button>
                   <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(u)}>Delete</button>
                 </td>
               </tr>
@@ -191,7 +191,7 @@ export default function UsersPage() {
                   )}
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
+                  <button type="button" className="btn btn-outline-light" onClick={() => setShowForm(false)}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Save</button>
                 </div>
               </form>

@@ -112,12 +112,12 @@ export default function EvOwnersPage() {
     // Full-width content container with padding
     <div className="mt-4 p-3 p-md-4">
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <h3>EV Owners</h3>
+        <h3 className="ev-page-title m-0">EV Owners</h3>
         <button className="btn btn-primary" onClick={onAdd}>Add Owner</button>
       </div>
       <Toast type={error ? 'error' : 'success'} message={error || success} />
 
-      <div className="card shadow-sm">
+      <div className="ev-card">
         <div className="table-responsive">
           <table className="table table-striped mb-0">
           <thead>
@@ -139,7 +139,7 @@ export default function EvOwnersPage() {
                 <td>{o.phone}</td>
                 <td>{statusLabel(o.status)}</td>
                 <td className="text-end">
-                  <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => onEdit(o)}>Edit</button>
+                  <button className="btn btn-sm btn-outline-light me-2" onClick={() => onEdit(o)}>Edit</button>
                   <button className="btn btn-sm btn-outline-warning me-2" onClick={() => onToggle(o)}>{statusLabel(o.status) === 'Active' ? 'Deactivate' : 'Activate'}</button>
                   <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(o)}>Delete</button>
                 </td>
@@ -167,7 +167,7 @@ export default function EvOwnersPage() {
                   <Input label="Vehicle Details" value={form.vehicleDetails} onChange={(e) => setForm({ ...form, vehicleDetails: e.target.value })} placeholder="vehicle(optional)" />
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
+                  <button type="button" className="btn btn-outline-light" onClick={() => setShowForm(false)}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Save</button>
                 </div>
               </form>

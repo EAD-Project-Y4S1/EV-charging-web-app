@@ -43,9 +43,12 @@ export default function LoginPage() {
    
   return (
     <div className="container d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
-      <div className="card shadow-sm" style={{ maxWidth: 420, width: '100%' }}>
+      <div className="ev-card" style={{ maxWidth: 420, width: '100%' }}>
         <div className="card-body">
-          <h5 className="card-title mb-3">Sign in</h5>
+          <div className="text-center mb-3">
+            <div className="ev-badge">EV Charging</div>
+          </div>
+          <h5 className="card-title mb-3 ev-page-title">Sign in</h5>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label className="form-label">Email address</label>
@@ -85,8 +88,8 @@ export default function LoginPage() {
           </form>
           
           {/* Default credentials info for development */}
-          <div className="mt-3 p-2 bg-light rounded">
-            <small className="text-muted">
+          <div className="mt-3 p-2" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 8 }}>
+            <small className="ev-subtitle">
               <strong>Default Admin Credentials:</strong><br />
               Email: admin@evcs.local<br />
               Password: Admin#12345

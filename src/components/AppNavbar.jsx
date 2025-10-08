@@ -12,11 +12,17 @@ export function AppNavbar() {
   const isOperator = user?.role === 'Operator'
 
   return (
-    // Width adjustment: make navbar full-width and fixed to top
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    // Full-width, fixed, EV-themed gradient navbar
+    <nav className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
       {/* Changed from .container to .container-fluid for full-width navbar */}
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/">EV Charging</Link>
+        <Link className="navbar-brand d-flex align-items-center gap-2" to="/">
+          {/* Simple lightning bolt icon using SVG to match EV theme */}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M13 2L3 14h7l-1 8 11-12h-7l0-8z"></path>
+          </svg>
+          <span>EV Charging</span>
+        </Link>
         <button
           className="navbar-toggler"
           type="button"

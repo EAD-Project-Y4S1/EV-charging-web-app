@@ -1,11 +1,29 @@
 :root {
+  /* Typography */
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* EV Blue Theme Variables */
+  --ev-primary: #1463ff;           /* Electric blue */
+  --ev-primary-600: #0e4dd1;
+  --ev-primary-700: #0a3ea8;
+  --ev-secondary: #12b981;         /* Softer green accent */
+  --ev-bg: #f7f9fc;                 /* Light base background */
+  --ev-surface: #ffffff;            /* White cards */
+  --ev-border: #e5e7eb;             /* Light border */
+  --ev-text: #0f172a;               /* Slate-900 */
+  --ev-muted: #64748b;              /* Slate-500 */
+
+  /* Map to Bootstrap CSS vars where possible */
+  --bs-primary: var(--ev-primary);
+  --bs-primary-rgb: 20, 99, 255;
+  --bs-link-color: var(--ev-primary);
+  --bs-link-hover-color: var(--ev-primary-600);
+
+  color-scheme: light;
+  color: var(--ev-text);
+  background-color: var(--ev-bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,19 +33,21 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: var(--ev-primary);
+  text-decoration: none;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--ev-primary-600);
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 110% -10%, rgba(20, 99, 255, 0.08), rgba(20, 99, 255, 0) 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(18, 185, 129, 0.08), rgba(18, 185, 129, 0) 60%),
+    linear-gradient(180deg, #fafdff 0%, #f7f9fc 60%, #f4f6fa 100%);
 }
 
 h1 {
@@ -42,27 +62,113 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--ev-surface);
+  color: var(--ev-text);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.05s ease-in-out;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--ev-primary);
+}
+button:active {
+  transform: translateY(1px);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 3px solid rgba(20, 99, 255, 0.35);
+  outline-offset: 1px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Themed utilities */
+.ev-page-title {
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.ev-subtitle {
+  color: var(--ev-muted);
+}
+
+.ev-card {
+  background: var(--ev-surface);
+  border: 1px solid var(--ev-border);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
+}
+
+.ev-stat-card {
+  background: linear-gradient(180deg, rgba(20, 99, 255, 0.08), rgba(20, 99, 255, 0.02)), var(--ev-surface);
+  border: 1px solid var(--ev-border);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
+}
+
+.navbar.bg-primary {
+  background: linear-gradient(90deg, var(--ev-primary-700), var(--ev-primary)) !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.table thead th {
+  background: rgba(20, 99, 255, 0.06);
+  color: var(--ev-text);
+  border-bottom-color: var(--ev-border);
+}
+
+.table {
+  color: var(--ev-text);
+}
+
+.modal-content {
+  background: var(--ev-surface);
+  color: var(--ev-text);
+  border: 1px solid var(--ev-border);
+}
+
+/* Bootstrap component theming */
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--ev-primary);
+  --bs-btn-border-color: var(--ev-primary);
+  --bs-btn-hover-bg: var(--ev-primary-600);
+  --bs-btn-hover-border-color: var(--ev-primary-600);
+  --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+  --bs-btn-active-bg: var(--ev-primary-700);
+  --bs-btn-active-border-color: var(--ev-primary-700);
+}
+
+.btn-outline-light {
+  --bs-btn-color: #334155;
+  --bs-btn-border-color: var(--ev-border);
+  --bs-btn-hover-bg: #f8fafc;
+  --bs-btn-hover-border-color: #cbd5e1;
+}
+
+.form-control, .form-select {
+  background-color: #ffffff;
+  border: 1px solid var(--ev-border);
+  color: var(--ev-text);
+}
+.form-control::placeholder { color: #94a3b8; }
+.form-control:focus, .form-select:focus {
+  background-color: #ffffff;
+  color: var(--ev-text);
+  border-color: var(--ev-primary);
+  box-shadow: 0 0 0 0.25rem rgba(20, 99, 255, 0.15);
+}
+
+.alert-success { background-color: #ecfdf5; color: #065f46; border-color: #d1fae5; }
+.alert-danger { background-color: #fef2f2; color: #991b1b; border-color: #fee2e2; }
+.alert-warning { background-color: #fffbeb; color: #92400e; border-color: #fef3c7; }
+
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+  --bs-table-accent-bg: #f8fafc;
+}
+.table> :not(caption)>*>* {
+  background-color: transparent;
+  border-bottom-color: var(--ev-border);
 }

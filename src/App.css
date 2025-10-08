@@ -1,8 +1,7 @@
 #root {
-  max-width: 1280px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 1.5rem;
 }
 
 .logo {
@@ -38,5 +37,21 @@
 }
 
 .read-the-docs {
-  color: #888;
+  color: var(--ev-muted);
+}
+
+/* Page scaffolding */
+.page-container {
+  padding: 1rem;
+}
+
+.ev-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #d1fae5;
 }
